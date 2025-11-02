@@ -1,6 +1,55 @@
 from django.contrib import admin
+
+from automator.models.ai_models import AiModel, AiProvider
 from .models import Template, PAT, Project, MergeRequest
 
+@admin.register(AiModel)
+class AIModelAdmin(admin.ModelAdmin):
+    """Customized admin for AIModel model"""
+    list_display = ['name', 'provider', 'created_at']
+    list_filter = ['created_at']
+    search_fields = ['name']
+    readonly_fields = ['created_at', 'updated_at', 'deleted_at']
+    
+    fieldsets = (
+        ('Basic Info', {
+            'fields': ('name', 'provider')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at', 'deleted_at'),
+            'classes': ('collapse',)  # Collapsible section
+        }),
+    )
+    
+    def is_deleted(self, obj):
+        """Show if soft-deleted"""
+        return obj.deleted_at is not None
+    is_deleted.boolean = True  # Show as icon
+    is_deleted.short_description = 'Deleted'
+
+@admin.register(AiProvider)
+class AIProviderAdmin(admin.ModelAdmin):
+    """Customized admin for AIProvider model"""
+    list_display = ['name', 'status', 'created_at']
+    list_filter = ['created_at']
+    search_fields = ['name', 'status']
+    readonly_fields = ['created_at', 'updated_at', 'deleted_at']
+    
+    fieldsets = (
+        ('Basic Info', {
+            'fields': ('name', 'status')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at', 'deleted_at'),
+            'classes': ('collapse',)  # Collapsible section
+        }),
+    )
+    
+    def is_deleted(self, obj):
+        """Show if soft-deleted"""
+        return obj.deleted_at is not None
+    is_deleted.boolean = True  # Show as icon
+    is_deleted.short_description = 'Deleted'
 
 @admin.register(Template)
 class TemplateAdmin(admin.ModelAdmin):

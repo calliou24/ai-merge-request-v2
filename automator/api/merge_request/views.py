@@ -11,7 +11,7 @@ from merge_automator.services.ai_providers import get_ai_mr_data
 from .serializer import CreateMRDataSerializer, CreateMergeRequestDataSerializer, MergeRequestDataResponseSerializer
 from .utils.diffs_utils import Build_optimized_diffs, extract_section
 
-from ...models import PAT, Project, Template
+from ...models import PAT, Project, Template, AiProvider, AiModel
 
 class GenerateMergeRequestDataView(APIView):
     permission_classes=[IsAuthenticated]
@@ -21,7 +21,21 @@ class GenerateMergeRequestDataView(APIView):
 
         if not serializer.is_valid():
             return Response(serializer.errors, HTTP_400_BAD_REQUEST)
+        
+        ai_provider_id = serializer.validated_data.get('provider_id')
 
+        try:
+            ai_provider = AiProvider.objects.get(id=ai_provider_id)
+        except AiProvider.DoesNotExist:
+            return Response({"errors": f"Provider with id {ai_provider_id} does not exist"}, HTTP_400_BAD_REQUEST)
+
+        ai_model_id = serializer.validated_data.get('model_id') 
+
+        try:
+            ai_model = AiModel.objects.get(id=ai_model_id)
+        except AiModel.DoesNotExist:
+            return Response({"errors": f"Model with id {ai_model_id} does not exist"}, HTTP_400_BAD_REQUEST)
+    
         project_id = serializer.validated_data.get('project_id')
         try:
             project = Project.objects.get(id=project_id, user=request.user)
@@ -63,6 +77,8 @@ class GenerateMergeRequestDataView(APIView):
             template=template.content,
             title=template.title,
             user_context=ai_context,
+            provider_type=ai_provider.name,
+            model=ai_model.name
         )
 
         if not mr_data:

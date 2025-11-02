@@ -1,8 +1,8 @@
 from openai import OpenAI
 from cerebras.cloud.sdk import Cerebras
 
+from automator.models.ai_models import AIProviderNameCoices 
 from merge_automator.config import config
-from merge_automator.types.ai_providers import ProviderType 
 
 def process_with_open_router(model: str, messages: []):
     print(config.OPEN_ROUTER_API_KEY)
@@ -32,7 +32,7 @@ def get_ai_mr_data(
     template: str,
     title: str,
     user_context: str,
-    provider_type: ProviderType = ProviderType.OPEN_ROUTER,
+    provider_type: AIProviderNameCoices,
     model: str = 'minimax/minimax-m2:free',
 ):
     system_prompt = f"""
@@ -157,9 +157,9 @@ def get_ai_mr_data(
         {"role": "user", "content": user_message},
     ]
 
-    if provider_type == ProviderType.OPEN_ROUTER:
+    if provider_type == AIProviderNameCoices.OPEN_ROUTER:
         llm_response = process_with_open_router(model, messages)
-    elif provider_type == ProviderType.CEREBRAS:
+    elif provider_type == AIProviderNameCoices.CEREBRAS:
         llm_response = process_with_cerebras(model, messages)
 
     try:

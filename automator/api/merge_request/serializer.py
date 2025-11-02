@@ -2,6 +2,9 @@
 from rest_framework import serializers 
 
 class CreateMRDataSerializer(serializers.Serializer):
+    provider_id = serializers.IntegerField()
+    model_id = serializers.IntegerField()
+
     project_id = serializers.IntegerField()
     template_id = serializers.IntegerField()
     pat_id = serializers.IntegerField()
